@@ -12,3 +12,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 pip install pystemd
 ```
+
+## Deployment
+Just use banool/server-setup.
