@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+html {
+  max-width: 70ch;
+  padding: 3em 1em;
+  margin: auto;
+  line-height: 1.75;
+  font-size: 1.25em;
+}
+#mybuttons {
+  display: flex;
+  flex-direction: row;
+  width: 10ch;
+}
+#mybuttons > .mybutton {
+  flex: auto;
+}
+</style>
+</head>
+<body>
+<h1>Server Control Panel</h1>
+{% for unit, status in unit_to_status.items() %}
+<h2>{{ unit.title() }}</h2>
+<p>Status: {{ status }}</p>
+<div id="mybuttons">
+    <div class="mybutton">
+		<form action="/start/{{ unit }}" method="post">
+			<button name="Start" value="">Start</button>
+		</form>
+	</div>
+    <div class="mybutton">
+		<form action="/stop/{{ unit }}" method="post">
+			<button name="Stop" value="">Stop</button>
+		</form>
+	</div>
+</div>
+{% endfor %}
+</body>
+</html>
+
