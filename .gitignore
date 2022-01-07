@@ -1,4 +1,5 @@
 # Mine
+/myvenv
 *.swp
 
 # From https://github.com/rust-lang/rust/blob/master/.gitignore
