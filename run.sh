@@ -11,7 +11,7 @@ if [[ -z "${PORT}" ]]; then
 fi
 
 # If the virtual environment doesn't exist, make it.
-if [ -d "myvenv" ]; then
+if [ ! -d "myvenv" ]; then
     python3 -m venv myvenv
 fi
 
