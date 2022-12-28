@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>Server Control Panel</title>
+<link rel="stylesheet" href="https://unpkg.com/some-nice-basic-css/global.css" />
 <style>
 html {
   max-width: 70ch;
@@ -10,32 +11,39 @@ html {
   line-height: 1.75;
   font-size: 1.25em;
 }
-#mybuttons {
-  display: flex;
-  flex-direction: row;
-  width: 10ch;
+button {
+  background-color: rgba(51, 51, 51, 0.05);
+  border-radius: 8px;
+  border-width: 0;
+  color: #333333;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0px auto;
+  padding: 10px 12px;
+  text-align: center;
+  vertical-align: baseline;
 }
-#mybuttons > .mybutton {
-  flex: auto;
+form {
+  display: inline;
+  padding-right: 8px;
 }
 </style>
 </head>
 <body>
 <h1>Server Control Panel</h1>
+<p><strong>Note:</strong> The page doesn't refresh automatically when starting and stopping, you have to refresh manually.</p>
 {% for unit, status in unit_to_status.items() %}
 <h2>{{ unit.title() }}</h2>
-<p>Status: {{ status }}</p>
-<div id="mybuttons">
-    <div class="mybutton">
-		<form action="/start/{{ unit }}" method="post">
-			<button name="Start" value="">Start</button>
-		</form>
-	</div>
-    <div class="mybutton">
-		<form action="/stop/{{ unit }}" method="post">
-			<button name="Stop" value="">Stop</button>
-		</form>
-	</div>
+<p>Status: {{ "starting..." if status == "start" else ("stopping..." if status == "stop" else status) }}</p>
+<div>
+	<form action="/start/{{ unit }}" method="post">
+		<button name="Start" value="">Start</button>
+	</form>
+	<form action="/stop/{{ unit }}" method="post">
+		<button name="Stop" value="">Stop</button>
+	</form>
 </div>
 {% endfor %}
 </body>
