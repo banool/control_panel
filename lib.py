@@ -92,17 +92,35 @@ def validate_unit_allowed(unit, units_to_control):
 def get_last_run_info(unit, userspace=True):
     if not unit.endswith(".service"):
         raise RuntimeError("Should only be used with .service units")
-    properties = ["ExecMainStartTimestampMonotonic", "ExecMainStatus"]
+    properties = [
+        "ExecMainStartTimestamp",
+        "ExecMainExitTimestamp",
+        "ExecMainStatus",
+    ]
     args = ["systemctl"]
     if userspace:
         args += ["--user"]
-    args += ["show", unit, "--property", ",".join(properties), "--no-page"]
+    args += [
+        "show",
+        unit,
+        "--property",
+        ",".join(properties),
+        "--no-page",
+        "--timestamp",
+        "unix",
+    ]
     out = subprocess.check_output(args, universal_newlines=True)
     d = {}
     for line in out.splitlines():
         key, value = line.split("=")
+        LOG.error(unit, "yooooooooo " + value)
+        with contextlib.suppress(IndexError):
+            if value[0] == "@":
+                value = value[1:]
         with contextlib.suppress(ValueError):
             value = int(value)
+        if value == "":
+            continue
         d[key] = value
     return d
 
