@@ -13,6 +13,7 @@ app = Flask(__name__)
 
 units_to_control = get_units_to_control()
 
+timer_units_to_report = get_timer_units_to_report()
 
 @app.route("/")
 def index():
@@ -37,3 +38,11 @@ def stop(unit):
     stop_unit(unit)
     LOG.info(f"Asked systemd to stop: {unit}")
     return redirect(url_for("index"))
+
+
+@app.route("/timers", methods=["GET"])
+def timers():
+    LOG.info(f"timers: Received request for timer info")
+    info = get_many_last_run_info(timer_units_to_report)
+    LOG.info(f"timers: Returning timer info: {info}")
+    return info

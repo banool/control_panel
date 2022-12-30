@@ -2,7 +2,9 @@
 
 import contextlib
 import logging
+import json
 import os
+import subprocess
 import sys
 
 from flask import abort, redirect, render_template, Flask, url_for
@@ -48,6 +50,67 @@ def stop_unit(unit):
         u.Unit.Stop(b"replace")
 
 
+def get_units_for_timers(userspace=True):
+    args = ["systemctl"]
+    if userspace:
+        args += ["--user"]
+    args += ["list-timers", "-o", "json", "--all"]
+    out = subprocess.check_output(args, universal_newlines=True)
+    j = json.loads(out)
+    units = [t["activates"] for t in j]
+    return [u for u in units if u != ""]
+
+
+# This returns the units that the timers activate.
+def get_timer_units_to_report():
+    timers_to_ignore = []
+    with contextlib.suppress(KeyError):
+        timers_to_ignore = os.environ["TIMER_UNITS_TO_IGNORE"].split(",")
+    timers_to_ignore = set(timers_to_ignore)
+
+    if not all(t.endswith(".service") for t in timers_to_ignore):
+        raise RuntimeError("TIMER_UNITS_TO_IGNORE should contain unit names ending with.service, not timer names")
+
+    units = []
+    units += [(u, True) for u in get_units_for_timers(userspace=True)]
+    units += [(u, False) for u in get_units_for_timers(userspace=False)]
+
+    out = []
+    for u in units:
+        if u[0] in timers_to_ignore:
+            continue
+        out.append(u)
+
+    return out
+
+
 def validate_unit_allowed(unit, units_to_control):
     if unit not in units_to_control:
         abort(400, f"Unit {unit} is not allowlisted")
+
+
+def get_last_run_info(unit, userspace=True):
+    if not unit.endswith(".service"):
+        raise RuntimeError("Should only be used with .service units")
+    properties = ["ExecMainStartTimestampMonotonic", "ExecMainStatus"]
+    args = ["systemctl"]
+    if userspace:
+        args += ["--user"]
+    args += ["show", unit, "--property", ",".join(properties), "--no-page"]
+    out = subprocess.check_output(args, universal_newlines=True)
+    d = {}
+    for line in out.splitlines():
+        key, value = line.split("=")
+        with contextlib.suppress(ValueError):
+            value = int(value)
+        d[key] = value
+    return d
+
+
+# Unit should be a tuple of (unit_name, userspace_bool)
+def get_many_last_run_info(units):
+    d = {}
+    for item in units:
+        unit, userspace = item  
+        d[unit] = get_last_run_info(unit, userspace=userspace)
+    return d
