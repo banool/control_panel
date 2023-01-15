@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from flask import Response
 from lib import *
 
 LOG = logging.getLogger(__name__)
@@ -14,6 +15,7 @@ app = Flask(__name__)
 units_to_control = get_units_to_control()
 
 timer_units_to_report = get_timer_units_to_report()
+
 
 @app.route("/")
 def index():
@@ -46,3 +48,18 @@ def timers():
     info = get_many_last_run_info(timer_units_to_report)
     LOG.info(f"timers: Returning timer info: {info}")
     return info
+
+
+@app.route("/timers_overall", methods=["GET"])
+def timers_overall():
+    LOG.info(f"timers: Received request for overall timer info")
+    info = get_many_last_run_info(timer_units_to_report)
+    all_successful = all(s == 0 for s in [i["ExecMainStatus"] for i in info.values()])
+    if all_successful:
+        message = "For each timer, the most recent run was successful 🤠"
+        status = 200
+    else:
+        message = "The last run of one of the timers was not successful 😭"
+        status = 500
+    LOG.info(f"timers: Returning status {status} based on info {info}")
+    return Response(message, status=status)

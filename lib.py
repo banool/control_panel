@@ -69,7 +69,9 @@ def get_timer_units_to_report():
     timers_to_ignore = set(timers_to_ignore)
 
     if not all(t.endswith(".service") for t in timers_to_ignore):
-        raise RuntimeError("TIMER_UNITS_TO_IGNORE should contain unit names ending with.service, not timer names")
+        raise RuntimeError(
+            "TIMER_UNITS_TO_IGNORE should contain unit names ending with.service, not timer names"
+        )
 
     units = []
     units += [(u, True) for u in get_units_for_timers(userspace=True)]
@@ -113,7 +115,6 @@ def get_last_run_info(unit, userspace=True):
     d = {}
     for line in out.splitlines():
         key, value = line.split("=")
-        LOG.error(unit, "yooooooooo " + value)
         with contextlib.suppress(IndexError):
             if value[0] == "@":
                 value = value[1:]
@@ -129,6 +130,6 @@ def get_last_run_info(unit, userspace=True):
 def get_many_last_run_info(units):
     d = {}
     for item in units:
-        unit, userspace = item  
+        unit, userspace = item
         d[unit] = get_last_run_info(unit, userspace=userspace)
     return d
