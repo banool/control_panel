@@ -1,5 +1,5 @@
 click>=8.0.3
-Cython>=0.29.26
+cython>=0.29.34
 Flask>=2.0.2
 gunicorn>=20.1.0
 itsdangerous>=2.0.1

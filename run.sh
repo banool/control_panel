@@ -21,7 +21,7 @@ fi
 # Install dependencies if necessary.
 pip install --upgrade pip
 pip install -r requirements.txt
-pip install git+https://github.com/facebookincubator/pystemd.git@b39622ed0da502394f17df202ab21ca1089704bc
+pip install git+https://github.com/facebookincubator/pystemd.git@961e61f736582e0a25396c6e81bf77c587d22ed3
 
 # Run gunicorn.
 gunicorn -w 2 -b 127.0.0.1:$PORT app:app
