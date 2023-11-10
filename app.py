@@ -12,9 +12,8 @@ LOG.setLevel("DEBUG")
 
 app = Flask(__name__)
 
-units_to_control = get_units_to_control()
 
-timer_units_to_report = get_timer_units_to_report()
+units_to_control = get_units_to_control()
 
 
 @app.route("/")
@@ -45,6 +44,7 @@ def stop(unit):
 @app.route("/timers", methods=["GET"])
 def timers():
     LOG.info(f"timers: Received request for timer info")
+    timer_units_to_report = get_timer_units_to_report()
     info = get_many_last_run_info(timer_units_to_report)
     LOG.info(f"timers: Returning timer info: {info}")
     return info
@@ -53,6 +53,7 @@ def timers():
 @app.route("/timers_overall", methods=["GET"])
 def timers_overall():
     LOG.info(f"timers: Received request for overall timer info")
+    timer_units_to_report = get_timer_units_to_report()
     info = get_many_last_run_info(timer_units_to_report)
     all_successful = all(s == 0 for s in [i["ExecMainStatus"] for i in info.values()])
     if all_successful:

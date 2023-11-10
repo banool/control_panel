@@ -58,7 +58,7 @@ def get_units_for_timers(userspace=True):
     out = subprocess.check_output(args, universal_newlines=True)
     j = json.loads(out)
     units = [t["activates"] for t in j]
-    return [u for u in units if u != ""]
+    return [u for u in units if u]
 
 
 # This returns the units that the timers activate.
